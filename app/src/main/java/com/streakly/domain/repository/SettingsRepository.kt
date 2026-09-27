@@ -2,6 +2,7 @@ package com.streakly.domain.repository
 
 import com.streakly.domain.model.AppearanceSettings
 import com.streakly.domain.model.NotificationSettings
+import com.streakly.domain.model.ThemeMode
 import com.streakly.domain.model.UserGoals
 import com.streakly.domain.model.UserProfile
 import kotlinx.coroutines.flow.Flow
