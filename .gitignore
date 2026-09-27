@@ -1,0 +1,13 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Android Studio / IDE
+.idea/
+*.iml
+.omc/
+.claude/
+*.log
+local.properties
+.DS_Store
