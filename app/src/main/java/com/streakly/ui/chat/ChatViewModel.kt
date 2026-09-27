@@ -153,14 +153,20 @@ class ChatViewModel @Inject constructor(
 
                 executeConversationLoop(apiKey, profile.selectedModel)
             } catch (e: Exception) {
+                val errorDetails = if (e is retrofit2.HttpException) {
+                    val body = runCatching { e.response()?.errorBody()?.string() }.getOrNull()
+                    "API Error (${e.code()}): ${body ?: e.message()}"
+                } else {
+                    e.message ?: "Failed to generate AI response"
+                }
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         activeToolStatus = null,
-                        errorMessage = e.message ?: "Failed to generate AI response",
+                        errorMessage = errorDetails,
                         messages = it.messages + ChatMessage(
                             role = "assistant",
-                            content = "I encountered an error connecting to the NVIDIA NIM inference service. Please check your network and API key."
+                            content = "I encountered an error connecting to the NVIDIA NIM inference service: $errorDetails"
                         )
                     )
                 }
@@ -180,7 +186,8 @@ class ChatViewModel @Inject constructor(
                     role = msg.role,
                     content = msg.content,
                     name = msg.toolName,
-                    toolCallId = msg.toolCallId
+                    toolCallId = msg.toolCallId,
+                    toolCalls = msg.toolCalls
                 )
             }
 
@@ -209,6 +216,14 @@ class ChatViewModel @Inject constructor(
             val toolCalls = assistantMessage.toolCalls
 
             if (!toolCalls.isNullOrEmpty()) {
+                val assistantCallMessage = ChatMessage(
+                    role = "assistant",
+                    content = assistantMessage.content ?: "",
+                    toolCalls = toolCalls
+                )
+                _uiState.update { it.copy(messages = it.messages + assistantCallMessage) }
+
+                // Handle Tool Calls
                 for (toolCall in toolCalls) {
                     _uiState.update { it.copy(activeToolStatus = "Executing ${toolCall.function.name}...") }
                     val toolResult = executeTool(toolCall.function)
@@ -241,10 +256,12 @@ class ChatViewModel @Inject constructor(
             when (functionCall.name) {
                 "get_health_metrics" -> {
                     val summary = healthRepository.getTodayHealthSummary().first()
+                    val todayWater = waterRepository.getTodayTotalMl(DateUtils.getTodayIso())
                     val json = JSONObject()
                     json.put("steps", summary.steps.toLong())
                     json.put("targetSteps", summary.targetSteps.toLong())
                     json.put("caloriesBurned", summary.caloriesBurned.toLong())
+                    json.put("waterConsumedMl", todayWater.toLong())
                     json.put("sleepDurationMinutes", summary.sleepDurationMinutes?.toLong() ?: 0L)
                     json.put("readinessScore", summary.readinessScore?.score?.toLong() ?: 0L)
                     json.put("readinessDescription", summary.readinessScore?.description ?: "N/A")
@@ -253,10 +270,12 @@ class ChatViewModel @Inject constructor(
                 "log_water" -> {
                     val args = JSONObject(functionCall.arguments)
                     val amount = args.optInt("amount_ml", 250)
+                    waterRepository.logWater(amount)
+                    val total = waterRepository.getTodayTotalMl(DateUtils.getTodayIso())
                     val json = JSONObject()
                     json.put("status", "success")
                     json.put("logged_ml", amount.toLong())
-                    json.put("new_total_ml", 0L)
+                    json.put("new_total_ml", total.toLong())
                     json.toString()
                 }
                 "get_habits" -> {
@@ -287,7 +306,7 @@ class ChatViewModel @Inject constructor(
                         Habit(
                             name = name,
                             timeOfDay = timeOfDay,
-                            colorHex = "#5B6EF5"
+                            colorHex = "#1976D2"
                         )
                     )
                     val json = JSONObject()

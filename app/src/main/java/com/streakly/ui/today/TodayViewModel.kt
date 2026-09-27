@@ -3,6 +3,7 @@ package com.streakly.ui.today
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.streakly.domain.repository.HealthRepository
+import com.streakly.domain.repository.SettingsRepository
 import com.streakly.domain.repository.WaterRepository
 import com.streakly.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,12 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class TodayViewModel @Inject constructor(
     private val healthRepository: HealthRepository,
-    private val waterRepository: WaterRepository
+    private val waterRepository: WaterRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         TodayUiState(
-            userGreeting = DateUtils.getGreeting("Alex"),
+            userGreeting = DateUtils.getGreeting("Streakly User"),
             todayDateFormatted = DateUtils.getDisplayDate()
         )
     )
@@ -37,13 +39,22 @@ class TodayViewModel @Inject constructor(
             combine(
                 healthRepository.getTodayHealthSummary(),
                 healthRepository.getHourlyStepsToday(),
-                waterRepository.getTodayWater()
-            ) { summary, hourlySteps, waterIntake ->
+                waterRepository.getTodayWater(),
+                settingsRepository.userProfile
+            ) { summary, hourlySteps, waterIntake, profile ->
+                val greeting = DateUtils.getGreeting(profile.name.ifBlank { "User" })
+                val adjustedSummary = summary?.copy(
+                    targetSteps = profile.dailyStepGoal
+                )
                 _uiState.update { current ->
                     current.copy(
-                        summary = summary,
+                        summary = adjustedSummary ?: summary,
                         hourlySteps = hourlySteps,
-                        waterIntake = waterIntake,
+                        waterIntake = waterIntake.copy(
+                            targetGlasses = (profile.dailyWaterGoalMl / 250).coerceAtLeast(1)
+                        ),
+                        userGreeting = greeting,
+                        todayDateFormatted = DateUtils.getDisplayDate(),
                         isLoading = false
                     )
                 }

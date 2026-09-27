@@ -60,15 +60,15 @@ fun ChatScreen(
     val listState = rememberLazyListState()
 
     val quickPrompts = listOf(
-        "📊 How is my readiness today?",
-        "💧 Log 500ml water",
-        "🔥 Check my habit streaks",
-        "🌙 How did I sleep last night?"
+        "How is my readiness today?",
+        "Log 500ml water",
+        "Check my habit streaks",
+        "How did I sleep last night?"
     )
 
     LaunchedEffect(uiState.messages.size) {
         if (uiState.messages.isNotEmpty()) {
-            listState.animateScrollToItem(uiState.messages.size - 1)
+            listState.scrollToItem(uiState.messages.size - 1)
         }
     }
 
@@ -99,14 +99,14 @@ fun ChatScreen(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(CircleShape)
-                        .background(AccentIndigo.copy(alpha = 0.15f)),
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(PrimaryBlue.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.AutoAwesome,
                         contentDescription = "AI Coach",
-                        tint = AccentIndigo,
+                        tint = PrimaryBlue,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -123,12 +123,12 @@ fun ChatScreen(
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(4.dp))
                                 .background(SecondaryGreen)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "NVIDIA NIM Autonomous Agent",
+                            text = "AI Health Assistant",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
@@ -140,7 +140,7 @@ fun ChatScreen(
         // Active Tool Status Banner
         if (uiState.activeToolStatus != null) {
             Surface(
-                color = DarkPurple.copy(alpha = 0.15f),
+                color = PrimaryBlue.copy(alpha = 0.12f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -150,14 +150,14 @@ fun ChatScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.size(16.dp),
                         strokeWidth = 2.dp,
-                        color = DarkPurple
+                        color = PrimaryBlue
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = uiState.activeToolStatus ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
-                        color = DarkPurple
+                        color = PrimaryBlue
                     )
                 }
             }
@@ -211,7 +211,7 @@ fun ChatScreen(
         ) {
             items(quickPrompts) { prompt ->
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.clickable {
                         viewModel.sendMessage(prompt)
@@ -245,7 +245,7 @@ fun ChatScreen(
                     placeholder = { Text("Ask your AI Coach or give a command...") },
                     modifier = Modifier.weight(1f),
                     maxLines = 4,
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -261,9 +261,9 @@ fun ChatScreen(
                     enabled = inputText.isNotBlank() && !uiState.isLoading,
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(
-                            if (inputText.isNotBlank() && !uiState.isLoading) AccentIndigo else MaterialTheme.colorScheme.surfaceVariant
+                            if (inputText.isNotBlank() && !uiState.isLoading) PrimaryBlue else MaterialTheme.colorScheme.surfaceVariant
                         )
                 ) {
                     Icon(
@@ -313,6 +313,7 @@ private fun ChatMessageItem(message: ChatMessage) {
             }
         }
     } else {
+        if (message.content.isBlank()) return
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
@@ -324,7 +325,7 @@ private fun ChatMessageItem(message: ChatMessage) {
                     bottomStart = if (isUser) 16.dp else 4.dp,
                     bottomEnd = if (isUser) 4.dp else 16.dp
                 ),
-                color = if (isUser) AccentIndigo else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (isUser) PrimaryBlue else MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.fillMaxWidth(0.85f)
             ) {
                 Text(

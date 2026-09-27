@@ -34,4 +34,7 @@ interface HabitLogDao {
 
     @Query("SELECT * FROM habit_logs WHERE habitId = :habitId ORDER BY date DESC")
     suspend fun getAllLogsForHabitSync(habitId: Long): List<HabitLogEntity>
+
+    @Query("DELETE FROM habit_logs")
+    suspend fun deleteAll()
 }

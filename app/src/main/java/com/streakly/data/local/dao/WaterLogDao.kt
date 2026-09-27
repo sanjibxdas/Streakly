@@ -22,4 +22,7 @@ interface WaterLogDao {
 
     @Query("UPDATE water_logs SET glassesCount = :count, lastUpdated = :timestamp WHERE date = :date")
     suspend fun updateWaterCount(date: String, count: Int, timestamp: Long)
+
+    @Query("DELETE FROM water_logs")
+    suspend fun deleteAll()
 }

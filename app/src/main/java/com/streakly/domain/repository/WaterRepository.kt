@@ -8,4 +8,6 @@ interface WaterRepository {
     suspend fun addGlass()
     suspend fun removeGlass()
     suspend fun setGlasses(count: Int)
+    suspend fun logWater(amountMl: Int)
+    suspend fun getTodayTotalMl(date: String): Int
 }

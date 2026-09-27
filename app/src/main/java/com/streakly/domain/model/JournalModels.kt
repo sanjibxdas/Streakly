@@ -1,11 +1,11 @@
 package com.streakly.domain.model
 
 enum class Mood(val score: Int, val emoji: String, val label: String) {
-    GREAT(5, "😁", "Great"),
-    GOOD(4, "😊", "Good"),
-    NEUTRAL(3, "😐", "Neutral"),
-    BAD(2, "😔", "Bad"),
-    TERRIBLE(1, "😫", "Terrible");
+    GREAT(5, "", "Great"),
+    GOOD(4, "", "Good"),
+    NEUTRAL(3, "", "Neutral"),
+    BAD(2, "", "Bad"),
+    TERRIBLE(1, "", "Terrible");
 
     companion object {
         fun fromScore(score: Int): Mood {

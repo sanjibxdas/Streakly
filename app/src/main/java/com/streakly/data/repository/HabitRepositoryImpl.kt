@@ -62,6 +62,10 @@ class HabitRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllHabits(): List<Habit> {
+        return habitDao.getAllHabitsList().map { it.toDomain() }
+    }
+
     override suspend fun getHabitById(id: Long): Habit? {
         return habitDao.getHabitById(id)?.toDomain()
     }
@@ -148,7 +152,7 @@ class HabitRepositoryImpl @Inject constructor(
     companion object {
         fun calculateCurrentStreak(logs: List<HabitLogEntity>, todayIso: String): Int {
             val completedDates = logs.filter { it.completed }.map { it.date }.toSet()
-            var checkDate = LocalDate.parse(todayIso, DateTimeFormatter.ISO_LOCAL_DATE)
+            var checkDate = runCatching { LocalDate.parse(todayIso, DateTimeFormatter.ISO_LOCAL_DATE) }.getOrDefault(LocalDate.now())
 
             // If not completed today, streak can still be alive if completed yesterday
             if (!completedDates.contains(checkDate.format(DateTimeFormatter.ISO_LOCAL_DATE))) {
@@ -166,7 +170,7 @@ class HabitRepositoryImpl @Inject constructor(
         fun calculateLongestStreak(logs: List<HabitLogEntity>): Int {
             val sortedDates = logs
                 .filter { it.completed }
-                .map { LocalDate.parse(it.date, DateTimeFormatter.ISO_LOCAL_DATE) }
+                .mapNotNull { runCatching { LocalDate.parse(it.date, DateTimeFormatter.ISO_LOCAL_DATE) }.getOrNull() }
                 .distinct()
                 .sorted()
 

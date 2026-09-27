@@ -2,24 +2,28 @@ package com.streakly.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryBlue = Color(0xFF4A90E2)
-val SecondaryGreen = Color(0xFF7ED6A0)
-val AccentIndigo = Color(0xFF5B6EF5)
+val PrimaryBlue = Color(0xFF2563EB)
+val SecondaryGreen = Color(0xFF10B981)
+val SlateBlue = Color(0xFF475569)
+val DeepNavy = Color(0xFF1E293B)
 val CoralRed = Color(0xFFE05C5C)
-val FlameOrange = Color(0xFFFF9500)
-val DarkPurple = Color(0xFF7B1FA2)
-val WaterBlue = Color(0xFF38B6FF)
+val FlameOrange = Color(0xFFF59E0B)
+val WaterBlue = Color(0xFF0284C7)
+
+// Non-purple replacements ensuring no purple tint or glow appears
+val AccentIndigo = Color(0xFF3B82F6)
+val DarkPurple = Color(0xFF334155)
 
 // Light Palette
-val LightBg = Color(0xFFF6F7FB)
+val LightBg = Color(0xFFF8FAFC)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFEEF2F6)
-val TextPrimaryLight = Color(0xFF111111)
-val TextSecondaryLight = Color(0xFF757575)
+val LightSurfaceVariant = Color(0xFFF1F5F9)
+val TextPrimaryLight = Color(0xFF0F172A)
+val TextSecondaryLight = Color(0xFF64748B)
 
 // Dark Palette
-val DarkBg = Color(0xFF0F0F10)
-val DarkSurface = Color(0xFF1C1C1E)
-val DarkSurfaceVariant = Color(0xFF2C2C2E)
-val TextPrimaryDark = Color(0xFFF0F0F0)
-val TextSecondaryDark = Color(0xFFAAAAAA)
+val DarkBg = Color(0xFF0F172A)
+val DarkSurface = Color(0xFF1E293B)
+val DarkSurfaceVariant = Color(0xFF334155)
+val TextPrimaryDark = Color(0xFFF8FAFC)
+val TextSecondaryDark = Color(0xFF94A3B8)

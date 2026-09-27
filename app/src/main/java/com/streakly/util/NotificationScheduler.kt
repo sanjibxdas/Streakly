@@ -120,9 +120,12 @@ object NotificationScheduler {
         val parts = time.split(":")
         val hour = parts.getOrNull(0)?.toIntOrNull() ?: 21
         val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        val safeTime = runCatching {
+            LocalTime.of(hour.coerceIn(0, 23), minute.coerceIn(0, 59))
+        }.getOrDefault(LocalTime.of(21, 0))
 
         val now = LocalDateTime.now()
-        var scheduledTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(hour, minute))
+        var scheduledTime = LocalDateTime.of(LocalDate.now(), safeTime)
         if (scheduledTime.isBefore(now)) {
             scheduledTime = scheduledTime.plusDays(1)
         }

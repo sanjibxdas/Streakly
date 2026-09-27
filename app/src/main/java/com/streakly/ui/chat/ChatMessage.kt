@@ -1,5 +1,6 @@
 package com.streakly.ui.chat
 
+import com.streakly.data.remote.nvidia.NvidiaToolCall
 import java.util.UUID
 
 data class ChatMessage(
@@ -9,5 +10,6 @@ data class ChatMessage(
     val timestamp: Long = System.currentTimeMillis(),
     val toolName: String? = null,
     val toolCallId: String? = null,
+    val toolCalls: List<NvidiaToolCall>? = null,
     val isExecutingTool: Boolean = false
 )

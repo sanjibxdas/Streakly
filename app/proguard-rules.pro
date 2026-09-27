@@ -6,12 +6,11 @@
 -keep class * extends androidx.room.RoomDatabase
 -dontwarn androidx.room.paging.**
 
-# Keep Moshi models
+# Keep Moshi models and adapters
+-keep @com.squareup.moshi.JsonClass class * { *; }
+-keep class *JsonAdapter { *; }
 -keepclassmembers class * {
-    @com.squareup.moshi.Json *;
-}
--keep class * {
-    @com.squareup.moshi.JsonClass(generateAdapter = true) *;
+    @com.squareup.moshi.Json <fields>;
 }
 
 # Keep Health Connect

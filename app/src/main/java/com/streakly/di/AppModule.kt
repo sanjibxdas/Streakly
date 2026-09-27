@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.streakly.BuildConfig
 import com.streakly.data.local.StreaklyDatabase
 import com.streakly.data.local.dao.AgentTaskDao
 import com.streakly.data.local.dao.CachedHealthDataDao
@@ -91,7 +92,12 @@ object AppModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BASIC
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+            redactHeader("Authorization")
         }
         return OkHttpClient.Builder()
             .addInterceptor(logging)

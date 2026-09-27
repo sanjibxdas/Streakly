@@ -28,4 +28,7 @@ interface ChecklistItemDao {
 
     @Query("DELETE FROM checklist_items WHERE id = :id")
     suspend fun deleteItem(id: Long)
+
+    @Query("DELETE FROM checklist_items")
+    suspend fun deleteAll()
 }

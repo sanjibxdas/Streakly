@@ -79,4 +79,29 @@ class WaterRepositoryImpl @Inject constructor(
             waterLogDao.updateWaterCount(today, validCount, now)
         }
     }
+
+    override suspend fun logWater(amountMl: Int) {
+        val today = DateUtils.getTodayIso()
+        val existing = waterLogDao.getWaterLogForDate(today).firstOrNull()
+        val now = System.currentTimeMillis()
+        val addedGlasses = (amountMl / 250).coerceAtLeast(1)
+        val currentGlasses = existing?.glassesCount ?: 0
+        val newCount = currentGlasses + addedGlasses
+        if (existing == null) {
+            waterLogDao.insertWaterLog(
+                WaterLogEntity(
+                    date = today,
+                    glassesCount = newCount,
+                    lastUpdated = now
+                )
+            )
+        } else {
+            waterLogDao.updateWaterCount(today, newCount, now)
+        }
+    }
+
+    override suspend fun getTodayTotalMl(date: String): Int {
+        val existing = waterLogDao.getWaterLogForDate(date).firstOrNull()
+        return (existing?.glassesCount ?: 0) * 250
+    }
 }

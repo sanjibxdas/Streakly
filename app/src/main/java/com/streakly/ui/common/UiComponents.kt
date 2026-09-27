@@ -70,7 +70,7 @@ fun ProgressRing(
     modifier: Modifier = Modifier,
     size: Dp = 160.dp,
     strokeWidth: Dp = 14.dp,
-    gradientColors: List<Color> = listOf(PrimaryBlue, AccentIndigo),
+    color: Color = PrimaryBlue,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     content: @Composable () -> Unit = {}
 ) {
@@ -107,7 +107,7 @@ fun ProgressRing(
             // Progress arc
             if (animatedProgress.value > 0f) {
                 drawArc(
-                    brush = Brush.sweepGradient(gradientColors),
+                    color = color,
                     startAngle = -90f,
                     sweepAngle = animatedProgress.value * 360f,
                     useCenter = false,
@@ -188,7 +188,7 @@ fun MiniLineChart(
         fillPath.lineTo(size.width, size.height)
         fillPath.close()
 
-        drawPath(fillPath, brush = Brush.verticalGradient(listOf(fillColor, Color.Transparent)))
+        drawPath(fillPath, color = fillColor.copy(alpha = 0.12f))
         drawPath(path, color = lineColor, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
     }
 }

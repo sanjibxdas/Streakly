@@ -14,12 +14,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SentimentDissatisfied
+import androidx.compose.material.icons.filled.SentimentNeutral
+import androidx.compose.material.icons.filled.SentimentSatisfied
+import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
+import androidx.compose.material.icons.filled.SentimentVerySatisfied
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -42,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -132,8 +138,9 @@ fun JournalScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 24.dp, bottom = 80.dp),
-            containerColor = AccentIndigo,
-            contentColor = Color.White
+            containerColor = PrimaryBlue,
+            contentColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = "New Entry")
         }
@@ -146,6 +153,26 @@ fun JournalScreen(
                 }
             )
         }
+    }
+}
+
+private fun getMoodIcon(mood: Mood): ImageVector {
+    return when (mood) {
+        Mood.GREAT -> Icons.Default.SentimentVerySatisfied
+        Mood.GOOD -> Icons.Default.SentimentSatisfied
+        Mood.NEUTRAL -> Icons.Default.SentimentNeutral
+        Mood.BAD -> Icons.Default.SentimentDissatisfied
+        Mood.TERRIBLE -> Icons.Default.SentimentVeryDissatisfied
+    }
+}
+
+private fun getMoodColor(mood: Mood): Color {
+    return when (mood) {
+        Mood.GREAT -> Color(0xFF10B981)
+        Mood.GOOD -> Color(0xFF2563EB)
+        Mood.NEUTRAL -> Color(0xFF64748B)
+        Mood.BAD -> Color(0xFFF59E0B)
+        Mood.TERRIBLE -> Color(0xFFE05C5C)
     }
 }
 
@@ -169,11 +196,21 @@ private fun JournalEntryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = entry.mood.emoji,
-                        fontSize = 24.sp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(getMoodColor(entry.mood).copy(alpha = 0.15f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = getMoodIcon(entry.mood),
+                            contentDescription = entry.mood.label,
+                            tint = getMoodColor(entry.mood),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = entry.title,
@@ -267,7 +304,7 @@ private fun CreateJournalDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Mood: ${selectedMood.emoji} ${selectedMood.label}",
+                    text = "Mood: ${selectedMood.label}",
                     style = MaterialTheme.typography.labelLarge
                 )
                 Row(
@@ -275,8 +312,21 @@ private fun CreateJournalDialog(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Mood.entries.forEach { mood ->
-                        IconButton(onClick = { selectedMood = mood }) {
-                            Text(text = mood.emoji, fontSize = 22.sp)
+                        val isSelected = selectedMood == mood
+                        IconButton(
+                            onClick = { selectedMood = mood },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (isSelected) getMoodColor(mood).copy(alpha = 0.2f) else Color.Transparent
+                                )
+                        ) {
+                            Icon(
+                                imageVector = getMoodIcon(mood),
+                                contentDescription = mood.label,
+                                tint = if (isSelected) getMoodColor(mood) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
                 }
@@ -311,13 +361,17 @@ private fun CreateJournalDialog(
                         onSave(title, body, selectedMood, energyLevel.toInt(), tagsList)
                     }
                 },
+                shape = RoundedCornerShape(8.dp),
                 enabled = title.isNotBlank()
             ) {
                 Text("Save")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(8.dp)
+            ) {
                 Text("Cancel")
             }
         }

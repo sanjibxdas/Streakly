@@ -6,6 +6,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.streakly.data.local.dao.ChecklistItemDao
+import com.streakly.data.local.dao.GoalDao
+import com.streakly.data.local.dao.HabitDao
+import com.streakly.data.local.dao.HabitLogDao
+import com.streakly.data.local.dao.JournalEntryDao
+import com.streakly.data.local.dao.WaterLogDao
 import com.streakly.data.remote.nvidia.NvidiaNimClient
 import com.streakly.domain.model.AppearanceSettings
 import com.streakly.domain.model.NotificationSettings
@@ -24,7 +30,13 @@ private val Context.dataStore by preferencesDataStore(name = "settings_prefs")
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val waterLogDao: WaterLogDao,
+    private val habitDao: HabitDao,
+    private val habitLogDao: HabitLogDao,
+    private val journalEntryDao: JournalEntryDao,
+    private val goalDao: GoalDao,
+    private val checklistItemDao: ChecklistItemDao
 ) : SettingsRepository {
 
     private object PreferencesKeys {
@@ -155,26 +167,88 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateThemeMode(mode: ThemeMode) { context.dataStore.edit { it[PreferencesKeys.THEME_MODE] = mode.name } }
-    override suspend fun updateWaterGoal(goalMl: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_WATER_GOAL] = goalMl } }
-    override suspend fun updateStepGoal(steps: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_STEP_GOAL] = steps } }
-    override suspend fun updateSleepGoal(minutes: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_SLEEP_GOAL] = minutes } }
-    override suspend fun updateCalorieGoal(calories: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_CALORIE_GOAL] = calories } }
-    override suspend fun updateNvidiaApiKey(apiKey: String) { context.dataStore.edit { it[PreferencesKeys.NVIDIA_API_KEY] = apiKey } }
-    override suspend fun updateSelectedModel(model: String) { context.dataStore.edit { it[PreferencesKeys.SELECTED_MODEL] = model } }
-    override suspend fun toggleDailyReminder(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.DAILY_REMINDER_ENABLED] = enabled } }
-    override suspend fun toggleHydrationReminder(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = enabled } }
-    override suspend fun toggleHealthConnectSync(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = enabled } }
+
+    override suspend fun updateWaterGoal(goalMl: Int) {
+        context.dataStore.edit {
+            it[PreferencesKeys.DAILY_WATER_GOAL] = goalMl
+            it[PreferencesKeys.GOAL_WATER] = (goalMl / 250).coerceAtLeast(1)
+        }
+    }
+
+    override suspend fun updateStepGoal(steps: Int) {
+        context.dataStore.edit {
+            it[PreferencesKeys.DAILY_STEP_GOAL] = steps
+            it[PreferencesKeys.GOAL_STEPS] = steps
+        }
+    }
+
+    override suspend fun updateSleepGoal(minutes: Int) {
+        context.dataStore.edit {
+            it[PreferencesKeys.DAILY_SLEEP_GOAL] = minutes
+            it[PreferencesKeys.GOAL_SLEEP_MIN] = minutes
+        }
+    }
+
+    override suspend fun updateCalorieGoal(calories: Int) {
+        context.dataStore.edit { it[PreferencesKeys.DAILY_CALORIE_GOAL] = calories }
+    }
+
+    override suspend fun updateNvidiaApiKey(apiKey: String) {
+        context.dataStore.edit {
+            it[PreferencesKeys.NVIDIA_API_KEY] = apiKey
+            it[PreferencesKeys.AI_API_KEY] = apiKey
+        }
+    }
+
+    override suspend fun updateSelectedModel(model: String) {
+        context.dataStore.edit {
+            it[PreferencesKeys.SELECTED_MODEL] = model
+            it[PreferencesKeys.AI_MODEL] = model
+        }
+    }
+
+    override suspend fun toggleDailyReminder(enabled: Boolean) {
+        context.dataStore.edit {
+            it[PreferencesKeys.DAILY_REMINDER_ENABLED] = enabled
+            it[PreferencesKeys.NOTIF_BEDTIME] = enabled
+        }
+    }
+
+    override suspend fun toggleHydrationReminder(enabled: Boolean) {
+        context.dataStore.edit {
+            it[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = enabled
+            it[PreferencesKeys.NOTIF_HYDRATION] = enabled
+        }
+    }
+
+    override suspend fun toggleHealthConnectSync(enabled: Boolean) {
+        context.dataStore.edit { it[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = enabled }
+    }
 
     override suspend fun resetAllData() {
+        waterLogDao.deleteAll()
+        habitDao.deleteAll()
+        habitLogDao.deleteAll()
+        journalEntryDao.deleteAll()
+        goalDao.deleteAll()
+        checklistItemDao.deleteAll()
+
         context.dataStore.edit { prefs ->
             prefs[PreferencesKeys.DAILY_WATER_GOAL] = 2500
             prefs[PreferencesKeys.DAILY_STEP_GOAL] = 10000
             prefs[PreferencesKeys.DAILY_SLEEP_GOAL] = 480
             prefs[PreferencesKeys.DAILY_CALORIE_GOAL] = 2200
+            prefs[PreferencesKeys.GOAL_STEPS] = 10000
+            prefs[PreferencesKeys.GOAL_WATER] = 8
+            prefs[PreferencesKeys.GOAL_SLEEP_MIN] = 480
             prefs[PreferencesKeys.NVIDIA_API_KEY] = ""
+            prefs[PreferencesKeys.AI_API_KEY] = ""
             prefs[PreferencesKeys.SELECTED_MODEL] = "meta/llama-3.3-70b-instruct"
+            prefs[PreferencesKeys.AI_MODEL] = "meta/llama-3.3-70b-instruct"
             prefs[PreferencesKeys.DAILY_REMINDER_ENABLED] = true
+            prefs[PreferencesKeys.NOTIF_BEDTIME] = true
             prefs[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = true
+            prefs[PreferencesKeys.NOTIF_HYDRATION] = true
             prefs[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = false
         }
     }
