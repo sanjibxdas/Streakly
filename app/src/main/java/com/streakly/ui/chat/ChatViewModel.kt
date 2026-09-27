@@ -3,14 +3,14 @@ package com.streakly.ui.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.streakly.data.remote.nvidia.NvidiaChatRequest
-import com.streakly.data.remote.nvidia.NvidiaFunctionCall
+import com.streakly.data.remote.nvidia.NvidiaCallFunction
+import com.streakly.data.remote.nvidia.NvidiaFunction
 import com.streakly.data.remote.nvidia.NvidiaMessage
 import com.streakly.data.remote.nvidia.NvidiaNimClient
 import com.streakly.data.remote.nvidia.NvidiaParameters
 import com.streakly.data.remote.nvidia.NvidiaProperty
 import com.streakly.data.remote.nvidia.NvidiaTool
 import com.streakly.data.remote.nvidia.NvidiaToolCall
-import com.streakly.data.remote.nvidia.NvidiaToolDefinition
 import com.streakly.domain.model.Habit
 import com.streakly.domain.model.JournalEntry
 import com.streakly.domain.model.Mood
@@ -58,7 +58,7 @@ class ChatViewModel @Inject constructor(
     private val tools = listOf(
         NvidiaTool(
             type = "function",
-            function = NvidiaToolDefinition(
+            function = NvidiaFunction(
                 name = "get_health_metrics",
                 description = "Retrieve today's health metrics including steps, active calories, sleep duration, readiness score, and resting heart rate.",
                 parameters = NvidiaParameters(
@@ -70,7 +70,7 @@ class ChatViewModel @Inject constructor(
         ),
         NvidiaTool(
             type = "function",
-            function = NvidiaToolDefinition(
+            function = NvidiaFunction(
                 name = "log_water",
                 description = "Log water intake in milliliters (e.g., 250, 500, 750).",
                 parameters = NvidiaParameters(
@@ -87,7 +87,7 @@ class ChatViewModel @Inject constructor(
         ),
         NvidiaTool(
             type = "function",
-            function = NvidiaToolDefinition(
+            function = NvidiaFunction(
                 name = "get_habits",
                 description = "Retrieve user's active habits, completion status for today, and streak counts.",
                 parameters = NvidiaParameters(
@@ -99,7 +99,7 @@ class ChatViewModel @Inject constructor(
         ),
         NvidiaTool(
             type = "function",
-            function = NvidiaToolDefinition(
+            function = NvidiaFunction(
                 name = "create_habit",
                 description = "Create a new habit routine.",
                 parameters = NvidiaParameters(
@@ -242,7 +242,7 @@ class ChatViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = false, activeToolStatus = null) }
     }
 
-    private suspend fun executeTool(functionCall: NvidiaFunctionCall): String {
+    private suspend fun executeTool(functionCall: NvidiaCallFunction): String {
         return try {
             when (functionCall.name) {
                 "get_health_metrics" -> {

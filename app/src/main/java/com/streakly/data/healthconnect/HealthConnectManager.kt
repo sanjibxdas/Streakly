@@ -163,17 +163,17 @@ class HealthConnectManager @Inject constructor(
     fun readHourlySteps(date: LocalDate = LocalDate.now()): Flow<List<HourlySteps>> = flow {
         val random = Random(date.toEpochDay())
         val hourly = (0..23).map { hour ->
-            val count = when (hour) {
+            val count: Int = when (hour) {
                 in 0..5 -> 0
                 6 -> random.nextInt(50, 200)
                 7 -> random.nextInt(300, 900)
                 8 -> random.nextInt(500, 1200)
-                9..11 -> random.nextInt(200, 700)
+                in 9..11 -> random.nextInt(200, 700)
                 12 -> random.nextInt(600, 1400)
-                13..16 -> random.nextInt(200, 600)
+                in 13..16 -> random.nextInt(200, 600)
                 17 -> random.nextInt(800, 1800)
                 18 -> random.nextInt(700, 1500)
-                19..21 -> random.nextInt(300, 800)
+                in 19..21 -> random.nextInt(300, 800)
                 else -> random.nextInt(0, 100)
             }
             HourlySteps(hour = hour, count = count)

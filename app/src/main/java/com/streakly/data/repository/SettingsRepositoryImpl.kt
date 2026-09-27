@@ -12,6 +12,7 @@ import com.streakly.domain.model.NotificationSettings
 import com.streakly.domain.model.ThemeMode
 import com.streakly.domain.model.UserGoals
 import com.streakly.domain.model.UserProfile
+import com.streakly.util.NotificationScheduler
 import com.streakly.domain.repository.SettingsRepository
 import com.streakly.util.NotificationScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -49,6 +50,16 @@ class SettingsRepositoryImpl @Inject constructor(
         val AI_API_KEY = stringPreferencesKey("ai_api_key")
         val AI_BASE_URL = stringPreferencesKey("ai_base_url")
         val AI_MODEL = stringPreferencesKey("ai_model")
+
+        val DAILY_WATER_GOAL = intPreferencesKey("daily_water_goal")
+        val DAILY_STEP_GOAL = intPreferencesKey("daily_step_goal")
+        val DAILY_SLEEP_GOAL = intPreferencesKey("daily_sleep_goal")
+        val DAILY_CALORIE_GOAL = intPreferencesKey("daily_calorie_goal")
+        val NVIDIA_API_KEY = stringPreferencesKey("nvidia_api_key")
+        val SELECTED_MODEL = stringPreferencesKey("selected_model")
+        val DAILY_REMINDER_ENABLED = booleanPreferencesKey("daily_reminder_enabled")
+        val HYDRATION_REMINDER_ENABLED = booleanPreferencesKey("hydration_reminder_enabled")
+        val HEALTH_CONNECT_SYNC_ENABLED = booleanPreferencesKey("health_connect_sync_enabled")
     }
 
     override val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
@@ -56,7 +67,21 @@ class SettingsRepositoryImpl @Inject constructor(
             name = prefs[PreferencesKeys.USER_NAME] ?: "Streakly User",
             email = prefs[PreferencesKeys.USER_EMAIL] ?: "user@streakly.app",
             photoUrl = prefs[PreferencesKeys.USER_PHOTO],
-            memberSince = prefs[PreferencesKeys.MEMBER_SINCE] ?: "2024"
+            memberSince = prefs[PreferencesKeys.MEMBER_SINCE] ?: "2024",
+            nvidiaApiKey = prefs[PreferencesKeys.NVIDIA_API_KEY] ?: "",
+            selectedModel = prefs[PreferencesKeys.SELECTED_MODEL] ?: "meta/llama-3.3-70b-instruct",
+            isDailyReminderEnabled = prefs[PreferencesKeys.DAILY_REMINDER_ENABLED] ?: true,
+            isHydrationReminderEnabled = prefs[PreferencesKeys.HYDRATION_REMINDER_ENABLED] ?: true,
+            isHealthConnectSyncEnabled = prefs[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] ?: false,
+            dailyWaterGoalMl = prefs[PreferencesKeys.DAILY_WATER_GOAL] ?: 2500,
+            dailyStepGoal = prefs[PreferencesKeys.DAILY_STEP_GOAL] ?: 10000,
+            dailySleepGoalMinutes = prefs[PreferencesKeys.DAILY_SLEEP_GOAL] ?: 480,
+            dailyCalorieGoal = prefs[PreferencesKeys.DAILY_CALORIE_GOAL] ?: 2200,
+            themeMode = try {
+                ThemeMode.valueOf(prefs[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
+            } catch (e: Exception) {
+                ThemeMode.SYSTEM
+            }
         )
     }
 
@@ -155,5 +180,79 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[PreferencesKeys.NOTIF_NIGHT_TIME] = time
         }
         NotificationScheduler.scheduleNightReminder(context, time)
+    }
+
+    override suspend fun updateThemeMode(mode: ThemeMode) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.THEME_MODE] = mode.name
+        }
+    }
+
+    override suspend fun updateWaterGoal(goalMl: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_WATER_GOAL] = goalMl
+        }
+    }
+
+    override suspend fun updateStepGoal(steps: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_STEP_GOAL] = steps
+        }
+    }
+
+    override suspend fun updateSleepGoal(minutes: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_SLEEP_GOAL] = minutes
+        }
+    }
+
+    override suspend fun updateCalorieGoal(calories: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_CALORIE_GOAL] = calories
+        }
+    }
+
+    override suspend fun updateNvidiaApiKey(apiKey: String) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.NVIDIA_API_KEY] = apiKey
+        }
+    }
+
+    override suspend fun updateSelectedModel(model: String) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.SELECTED_MODEL] = model
+        }
+    }
+
+    override suspend fun toggleDailyReminder(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_REMINDER_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun toggleHydrationReminder(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun toggleHealthConnectSync(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun resetAllData() {
+        context.dataStore.edit { prefs ->
+            prefs[PreferencesKeys.DAILY_WATER_GOAL] = 2500
+            prefs[PreferencesKeys.DAILY_STEP_GOAL] = 10000
+            prefs[PreferencesKeys.DAILY_SLEEP_GOAL] = 480
+            prefs[PreferencesKeys.DAILY_CALORIE_GOAL] = 2200
+            prefs[PreferencesKeys.NVIDIA_API_KEY] = ""
+            prefs[PreferencesKeys.SELECTED_MODEL] = "meta/llama-3.3-70b-instruct"
+            prefs[PreferencesKeys.DAILY_REMINDER_ENABLED] = true
+            prefs[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = true
+            prefs[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = false
+        }
     }
 }

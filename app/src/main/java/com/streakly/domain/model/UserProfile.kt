@@ -4,7 +4,17 @@ data class UserProfile(
     val name: String = "Streakly User",
     val email: String = "",
     val photoUrl: String? = null,
-    val memberSince: String = "2024"
+    val memberSince: String = "2024",
+    val nvidiaApiKey: String = "",
+    val selectedModel: String = "meta/llama-3.3-70b-instruct",
+    val isDailyReminderEnabled: Boolean = true,
+    val isHydrationReminderEnabled: Boolean = true,
+    val isHealthConnectSyncEnabled: Boolean = false,
+    val dailyWaterGoalMl: Int = 2500,
+    val dailyStepGoal: Int = 10000,
+    val dailySleepGoalMinutes: Int = 480,
+    val dailyCalorieGoal: Int = 2200,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM
 )
 
 data class UserGoals(
