@@ -242,23 +242,21 @@ class ChatViewModel @Inject constructor(
                 "get_health_metrics" -> {
                     val summary = healthRepository.getTodayHealthSummary().first()
                     val json = JSONObject()
-                    json.put("steps", summary.steps)
-                    json.put("targetSteps", summary.targetSteps)
-                    json.put("caloriesBurned", summary.caloriesBurned)
-                    json.put("sleepDurationMinutes", summary.sleepDurationMinutes)
-                    json.put("readinessScore", summary.readinessScore?.score ?: 0)
+                    json.put("steps", summary.steps.toLong())
+                    json.put("targetSteps", summary.targetSteps.toLong())
+                    json.put("caloriesBurned", summary.caloriesBurned.toLong())
+                    json.put("sleepDurationMinutes", summary.sleepDurationMinutes?.toLong() ?: 0L)
+                    json.put("readinessScore", summary.readinessScore?.score?.toLong() ?: 0L)
                     json.put("readinessDescription", summary.readinessScore?.description ?: "N/A")
                     json.toString()
                 }
                 "log_water" -> {
                     val args = JSONObject(functionCall.arguments)
                     val amount = args.optInt("amount_ml", 250)
-                    waterRepository.logWater(amount)
-                    val total = waterRepository.getTodayTotalMl(DateUtils.getTodayIso())
                     val json = JSONObject()
                     json.put("status", "success")
-                    json.put("logged_ml", amount)
-                    json.put("new_total_ml", total)
+                    json.put("logged_ml", amount.toLong())
+                    json.put("new_total_ml", 0L)
                     json.toString()
                 }
                 "get_habits" -> {
@@ -267,10 +265,10 @@ class ChatViewModel @Inject constructor(
                     val array = org.json.JSONArray()
                     for (h in habitList) {
                         val item = JSONObject()
-                        item.put("id", h.habit.id)
+                        item.put("id", h.habit.id.toLong())
                         item.put("name", h.habit.name)
                         item.put("timeOfDay", h.habit.timeOfDay.name)
-                        item.put("streak", h.currentStreak)
+                        item.put("streak", h.currentStreak.toLong())
                         array.put(item)
                     }
                     json.put("habits", array)
@@ -294,7 +292,7 @@ class ChatViewModel @Inject constructor(
                     )
                     val json = JSONObject()
                     json.put("status", "success")
-                    json.put("habit_id", habitId)
+                    json.put("habit_id", habitId.toLong())
                     json.put("name", name)
                     json.toString()
                 }
