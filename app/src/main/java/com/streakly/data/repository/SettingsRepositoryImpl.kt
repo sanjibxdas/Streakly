@@ -12,7 +12,6 @@ import com.streakly.domain.model.NotificationSettings
 import com.streakly.domain.model.ThemeMode
 import com.streakly.domain.model.UserGoals
 import com.streakly.domain.model.UserProfile
-import com.streakly.util.NotificationScheduler
 import com.streakly.domain.repository.SettingsRepository
 import com.streakly.util.NotificationScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,24 +32,19 @@ class SettingsRepositoryImpl @Inject constructor(
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_PHOTO = stringPreferencesKey("user_photo")
         val MEMBER_SINCE = stringPreferencesKey("member_since")
-
         val GOAL_STEPS = intPreferencesKey("goal_steps")
         val GOAL_ACTIVE_MIN = intPreferencesKey("goal_active_min")
         val GOAL_SLEEP_MIN = intPreferencesKey("goal_sleep_min")
         val GOAL_WATER = intPreferencesKey("goal_water")
         val GOAL_CARDIO = intPreferencesKey("goal_cardio")
-
         val NOTIF_HYDRATION = booleanPreferencesKey("notif_hydration")
         val NOTIF_BEDTIME = booleanPreferencesKey("notif_bedtime")
         val NOTIF_STREAK = booleanPreferencesKey("notif_streak")
         val NOTIF_NIGHT_TIME = stringPreferencesKey("notif_night_time")
-
         val THEME_MODE = stringPreferencesKey("theme_mode")
-
         val AI_API_KEY = stringPreferencesKey("ai_api_key")
         val AI_BASE_URL = stringPreferencesKey("ai_base_url")
         val AI_MODEL = stringPreferencesKey("ai_model")
-
         val DAILY_WATER_GOAL = intPreferencesKey("daily_water_goal")
         val DAILY_STEP_GOAL = intPreferencesKey("daily_step_goal")
         val DAILY_SLEEP_GOAL = intPreferencesKey("daily_sleep_goal")
@@ -77,11 +71,9 @@ class SettingsRepositoryImpl @Inject constructor(
             dailyStepGoal = prefs[PreferencesKeys.DAILY_STEP_GOAL] ?: 10000,
             dailySleepGoalMinutes = prefs[PreferencesKeys.DAILY_SLEEP_GOAL] ?: 480,
             dailyCalorieGoal = prefs[PreferencesKeys.DAILY_CALORIE_GOAL] ?: 2200,
-            themeMode = try {
+            themeMode = runCatching {
                 ThemeMode.valueOf(prefs[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
-            } catch (e: Exception) {
-                ThemeMode.SYSTEM
-            }
+            }.getOrDefault(ThemeMode.SYSTEM)
         )
     }
 
@@ -105,36 +97,22 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override val appearanceSettings: Flow<AppearanceSettings> = context.dataStore.data.map { prefs ->
-        val modeStr = prefs[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
-        val mode = try {
-            ThemeMode.valueOf(modeStr)
-        } catch (e: Exception) {
-            ThemeMode.SYSTEM
-        }
-        AppearanceSettings(themeMode = mode)
+        AppearanceSettings(
+            themeMode = runCatching {
+                ThemeMode.valueOf(prefs[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
+            }.getOrDefault(ThemeMode.SYSTEM)
+        )
     }
 
-    override val aiApiKey: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[PreferencesKeys.AI_API_KEY] ?: ""
-    }
-
-    override val aiBaseUrl: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[PreferencesKeys.AI_BASE_URL] ?: NvidiaNimClient.DEFAULT_BASE_URL
-    }
-
-    override val aiModel: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[PreferencesKeys.AI_MODEL] ?: NvidiaNimClient.DEFAULT_MODEL
-    }
+    override val aiApiKey: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.AI_API_KEY] ?: "" }
+    override val aiBaseUrl: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.AI_BASE_URL] ?: NvidiaNimClient.DEFAULT_BASE_URL }
+    override val aiModel: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.AI_MODEL] ?: NvidiaNimClient.DEFAULT_MODEL }
 
     override suspend fun updateProfile(profile: UserProfile) {
         context.dataStore.edit { prefs ->
             prefs[PreferencesKeys.USER_NAME] = profile.name
             prefs[PreferencesKeys.USER_EMAIL] = profile.email
-            if (profile.photoUrl != null) {
-                prefs[PreferencesKeys.USER_PHOTO] = profile.photoUrl
-            } else {
-                prefs.remove(PreferencesKeys.USER_PHOTO)
-            }
+            if (profile.photoUrl == null) prefs.remove(PreferencesKeys.USER_PHOTO) else prefs[PreferencesKeys.USER_PHOTO] = profile.photoUrl
             prefs[PreferencesKeys.MEMBER_SINCE] = profile.memberSince
         }
     }
@@ -156,15 +134,11 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[PreferencesKeys.NOTIF_STREAK] = settings.streakWarnings
             prefs[PreferencesKeys.NOTIF_NIGHT_TIME] = settings.nightReminderTime
         }
-        if (settings.bedtimeReminders) {
-            NotificationScheduler.scheduleNightReminder(context, settings.nightReminderTime)
-        }
+        if (settings.bedtimeReminders) NotificationScheduler.scheduleNightReminder(context, settings.nightReminderTime)
     }
 
     override suspend fun updateAppearanceSettings(settings: AppearanceSettings) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.THEME_MODE] = settings.themeMode.name
-        }
+        context.dataStore.edit { it[PreferencesKeys.THEME_MODE] = settings.themeMode.name }
     }
 
     override suspend fun updateAiConfig(apiKey: String, baseUrl: String, model: String) {
@@ -176,71 +150,20 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setNightNotificationTime(time: String) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.NOTIF_NIGHT_TIME] = time
-        }
+        context.dataStore.edit { it[PreferencesKeys.NOTIF_NIGHT_TIME] = time }
         NotificationScheduler.scheduleNightReminder(context, time)
     }
 
-    override suspend fun updateThemeMode(mode: ThemeMode) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.THEME_MODE] = mode.name
-        }
-    }
-
-    override suspend fun updateWaterGoal(goalMl: Int) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.DAILY_WATER_GOAL] = goalMl
-        }
-    }
-
-    override suspend fun updateStepGoal(steps: Int) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.DAILY_STEP_GOAL] = steps
-        }
-    }
-
-    override suspend fun updateSleepGoal(minutes: Int) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.DAILY_SLEEP_GOAL] = minutes
-        }
-    }
-
-    override suspend fun updateCalorieGoal(calories: Int) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.DAILY_CALORIE_GOAL] = calories
-        }
-    }
-
-    override suspend fun updateNvidiaApiKey(apiKey: String) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.NVIDIA_API_KEY] = apiKey
-        }
-    }
-
-    override suspend fun updateSelectedModel(model: String) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.SELECTED_MODEL] = model
-        }
-    }
-
-    override suspend fun toggleDailyReminder(enabled: Boolean) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.DAILY_REMINDER_ENABLED] = enabled
-        }
-    }
-
-    override suspend fun toggleHydrationReminder(enabled: Boolean) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = enabled
-        }
-    }
-
-    override suspend fun toggleHealthConnectSync(enabled: Boolean) {
-        context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = enabled
-        }
-    }
+    override suspend fun updateThemeMode(mode: ThemeMode) { context.dataStore.edit { it[PreferencesKeys.THEME_MODE] = mode.name } }
+    override suspend fun updateWaterGoal(goalMl: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_WATER_GOAL] = goalMl } }
+    override suspend fun updateStepGoal(steps: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_STEP_GOAL] = steps } }
+    override suspend fun updateSleepGoal(minutes: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_SLEEP_GOAL] = minutes } }
+    override suspend fun updateCalorieGoal(calories: Int) { context.dataStore.edit { it[PreferencesKeys.DAILY_CALORIE_GOAL] = calories } }
+    override suspend fun updateNvidiaApiKey(apiKey: String) { context.dataStore.edit { it[PreferencesKeys.NVIDIA_API_KEY] = apiKey } }
+    override suspend fun updateSelectedModel(model: String) { context.dataStore.edit { it[PreferencesKeys.SELECTED_MODEL] = model } }
+    override suspend fun toggleDailyReminder(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.DAILY_REMINDER_ENABLED] = enabled } }
+    override suspend fun toggleHydrationReminder(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.HYDRATION_REMINDER_ENABLED] = enabled } }
+    override suspend fun toggleHealthConnectSync(enabled: Boolean) { context.dataStore.edit { it[PreferencesKeys.HEALTH_CONNECT_SYNC_ENABLED] = enabled } }
 
     override suspend fun resetAllData() {
         context.dataStore.edit { prefs ->
