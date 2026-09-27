@@ -48,7 +48,7 @@ class ChatViewModel @Inject constructor(
             messages = listOf(
                 ChatMessage(
                     role = "assistant",
-                    content = "Hello! I am your Streakly AI Coach. I can analyze your biometric trends, log water intake, track habits, review your sleep cycles, and guide your daily routines. What would you like to achieve today?"
+                    content = "Hello! I am your Streakly AI Coach. I can analyze your biometric trends, log water intake, track habits, review your sleep cycles, and guide your daily routines. What would you like to know today?"
                 )
             )
         )
@@ -186,7 +186,7 @@ class ChatViewModel @Inject constructor(
 
             val systemMessage = NvidiaMessage(
                 role = "system",
-                content = "You are Streakly AI Coach, an expert health, fitness, habit, and wellbeing autonomous coach. You have direct access to user health biometrics, hydration tracking, habit formation systems, goals, and journal. Keep responses concise, supportive, actionable, and science-grounded. Use available tools when appropriate to inspect or record user data."
+                content = "You are Streakly AI Coach, an expert health, fitness, habit, and wellbeing autonomous coach. You have direct access to user health biometrics, hydration tracking, habits, and wellness routines. Provide personalized, actionable guidance based on their data."
             )
 
             val request = NvidiaChatRequest(
@@ -209,24 +209,18 @@ class ChatViewModel @Inject constructor(
             val toolCalls = assistantMessage.toolCalls
 
             if (!toolCalls.isNullOrEmpty()) {
-                // Handle Tool Calls
                 for (toolCall in toolCalls) {
                     _uiState.update { it.copy(activeToolStatus = "Executing ${toolCall.function.name}...") }
-
                     val toolResult = executeTool(toolCall.function)
-
                     val toolMessage = ChatMessage(
                         role = "tool",
                         content = toolResult,
                         toolName = toolCall.function.name,
                         toolCallId = toolCall.id
                     )
-
                     _uiState.update { it.copy(messages = it.messages + toolMessage) }
                 }
-                // Continue loop with tool outputs
             } else {
-                // Assistant returned final message
                 val responseText = assistantMessage.content ?: "Done."
                 _uiState.update {
                     it.copy(
@@ -249,13 +243,11 @@ class ChatViewModel @Inject constructor(
                     val summary = healthRepository.getTodayHealthSummary().first()
                     val json = JSONObject()
                     json.put("steps", summary.steps)
-                    json.put("stepGoal", summary.stepGoal)
+                    json.put("targetSteps", summary.targetSteps)
                     json.put("caloriesBurned", summary.caloriesBurned)
-                    json.put("waterConsumedMl", summary.waterConsumedMl)
-                    json.put("waterGoalMl", summary.waterGoalMl)
                     json.put("sleepDurationMinutes", summary.sleepDurationMinutes)
-                    json.put("readinessScore", summary.readinessScore.score)
-                    json.put("readinessDescription", summary.readinessScore.description)
+                    json.put("readinessScore", summary.readinessScore?.score ?: 0)
+                    json.put("readinessDescription", summary.readinessScore?.description ?: "N/A")
                     json.toString()
                 }
                 "log_water" -> {
@@ -270,14 +262,15 @@ class ChatViewModel @Inject constructor(
                     json.toString()
                 }
                 "get_habits" -> {
-                    val habitList = habitRepository.getAllHabits()
+                    val habitList = habitRepository.getHabits().first()
                     val json = JSONObject()
                     val array = org.json.JSONArray()
                     for (h in habitList) {
                         val item = JSONObject()
-                        item.put("id", h.id)
-                        item.put("name", h.name)
-                        item.put("timeOfDay", h.timeOfDay.name)
+                        item.put("id", h.habit.id)
+                        item.put("name", h.habit.name)
+                        item.put("timeOfDay", h.habit.timeOfDay.name)
+                        item.put("streak", h.currentStreak)
                         array.put(item)
                     }
                     json.put("habits", array)
