@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
 

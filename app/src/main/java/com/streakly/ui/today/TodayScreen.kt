@@ -44,7 +44,6 @@ import com.streakly.ui.common.MiniBarChart
 import com.streakly.ui.common.ProgressRing
 import com.streakly.ui.common.SectionHeader
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
@@ -92,7 +91,7 @@ fun TodayScreen(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Habits",
-                        tint = AccentIndigo
+                        tint = PrimaryBlue
                     )
                 }
                 IconButton(onClick = onNavigateToChat) {
@@ -128,7 +127,7 @@ fun TodayScreen(
                     progress = progress,
                     size = 180.dp,
                     strokeWidth = 16.dp,
-                    gradientColors = listOf(PrimaryBlue, AccentIndigo)
+                    color = PrimaryBlue
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -262,7 +261,7 @@ fun TodayScreen(
                         Icon(
                             imageVector = Icons.Default.Nightlight,
                             contentDescription = "Sleep",
-                            tint = AccentIndigo,
+                            tint = WaterBlue,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))

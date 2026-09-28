@@ -38,11 +38,12 @@ import com.streakly.ui.common.ProgressRing
 import com.streakly.ui.common.SectionHeader
 import com.streakly.ui.common.StackedBar
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
-import com.streakly.ui.theme.DarkPurple
+import com.streakly.ui.theme.DeepNavy
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
+import com.streakly.ui.theme.SlateBlue
+import com.streakly.ui.theme.WaterBlue
 import com.streakly.util.DateUtils
 
 @Composable
@@ -84,7 +85,7 @@ fun SleepScreen(
                     progress = score / 100f,
                     size = 170.dp,
                     strokeWidth = 14.dp,
-                    gradientColors = listOf(DarkPurple, AccentIndigo)
+                    color = PrimaryBlue
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -124,9 +125,9 @@ fun SleepScreen(
                 SectionHeader(title = "Sleep Architecture", subtitle = "Breakdown across cycles")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val deepColor = DarkPurple
-                val remColor = AccentIndigo
-                val lightColor = PrimaryBlue
+                val deepColor = DeepNavy
+                val remColor = SlateBlue
+                val lightColor = WaterBlue
                 val awakeColor = FlameOrange
 
                 StackedBar(
@@ -172,8 +173,8 @@ fun SleepScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(90.dp),
-                        lineColor = AccentIndigo,
-                        fillColor = AccentIndigo.copy(alpha = 0.15f)
+                        lineColor = PrimaryBlue,
+                        fillColor = PrimaryBlue.copy(alpha = 0.15f)
                     )
                 }
             }

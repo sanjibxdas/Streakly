@@ -56,7 +56,6 @@ import com.streakly.domain.model.JournalEntry
 import com.streakly.domain.model.Mood
 import com.streakly.ui.common.EmptyState
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.PrimaryBlue
 import java.time.Instant
 import java.time.ZoneId

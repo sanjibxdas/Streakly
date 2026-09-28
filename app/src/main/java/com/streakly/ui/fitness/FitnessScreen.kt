@@ -39,10 +39,10 @@ import com.streakly.domain.model.WorkoutSession
 import com.streakly.ui.common.MiniBarChart
 import com.streakly.ui.common.SectionHeader
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
+import com.streakly.ui.theme.WaterBlue
 import com.streakly.util.DateUtils
 
 @Composable
@@ -170,13 +170,13 @@ fun FitnessScreen(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(AccentIndigo.copy(alpha = 0.15f)),
+                        .background(WaterBlue.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Speed,
                         contentDescription = "VO2 Max",
-                        tint = AccentIndigo
+                        tint = WaterBlue
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))

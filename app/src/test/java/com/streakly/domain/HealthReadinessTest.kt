@@ -38,11 +38,10 @@ class HealthReadinessTest {
 
         return ReadinessScore(
             score = totalScore,
+            description = description,
             sleepFactor = sleepFactor,
             activityFactor = activityFactor,
-            restingHrFactor = restingHrFactor,
-            description = description,
-            recommendation = "Stay hydrated and consistent."
+            restingHrFactor = restingHrFactor
         )
     }
 

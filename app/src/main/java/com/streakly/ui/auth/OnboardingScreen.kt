@@ -31,14 +31,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
@@ -67,11 +65,7 @@ fun OnboardingScreen(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(FlameOrange, AccentIndigo)
-                        )
-                    ),
+                    .background(FlameOrange),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -127,7 +121,7 @@ fun OnboardingScreen(
                 icon = Icons.Default.AutoAwesome,
                 title = "NVIDIA NIM AI Coach",
                 description = "Powered by state-of-the-art LLMs with multi-turn autonomous tool execution for health coaching.",
-                color = AccentIndigo
+                color = PrimaryBlue
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -150,7 +144,7 @@ fun OnboardingScreen(
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AccentIndigo
+                containerColor = PrimaryBlue
             )
         ) {
             Row(

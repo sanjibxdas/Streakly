@@ -42,11 +42,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.streakly.ui.common.ProgressRing
 import com.streakly.ui.common.SectionHeader
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
-import com.streakly.ui.theme.DarkPurple
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
+import com.streakly.ui.theme.SlateBlue
+import com.streakly.ui.theme.WaterBlue
 import com.streakly.ui.today.TodayViewModel
 
 @Composable
@@ -88,7 +88,7 @@ fun HealthScreen(
                         progress = (readiness?.score ?: 88) / 100f,
                         size = 100.dp,
                         strokeWidth = 10.dp,
-                        gradientColors = listOf(SecondaryGreen, PrimaryBlue)
+                        color = SecondaryGreen
                     ) {
                         Text(
                             text = "${readiness?.score ?: 88}",
@@ -120,7 +120,7 @@ fun HealthScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    ReadinessFactorItem("Sleep", "${readiness?.sleepFactor ?: 90}%", DarkPurple)
+                    ReadinessFactorItem("Sleep", "${readiness?.sleepFactor ?: 90}%", SlateBlue)
                     ReadinessFactorItem("Activity", "${readiness?.activityFactor ?: 85}%", PrimaryBlue)
                     ReadinessFactorItem("Resting HR", "${readiness?.restingHrFactor ?: 89}%", SecondaryGreen)
                 }
@@ -175,7 +175,7 @@ fun HealthScreen(
                 title = "Respiration",
                 value = "14.2 rpm",
                 status = "Steady",
-                iconColor = AccentIndigo
+                iconColor = WaterBlue
             )
         }
 

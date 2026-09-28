@@ -46,8 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.streakly.ui.theme.AccentIndigo
-import com.streakly.ui.theme.DarkPurple
+import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
 
 @Composable
@@ -187,7 +186,7 @@ fun ChatScreen(
                         CircularProgressIndicator(
                             modifier = Modifier.size(18.dp),
                             strokeWidth = 2.dp,
-                            color = AccentIndigo
+                            color = PrimaryBlue
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(

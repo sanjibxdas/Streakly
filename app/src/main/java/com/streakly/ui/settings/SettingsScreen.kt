@@ -34,7 +34,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,11 +59,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.streakly.domain.model.ThemeMode
 import com.streakly.ui.common.SectionHeader
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
-import com.streakly.ui.theme.DarkPurple
 import com.streakly.ui.theme.FlameOrange
 import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
+import com.streakly.ui.theme.SlateBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,10 +88,10 @@ fun SettingsScreen(
         SectionHeader(title = "Appearance", subtitle = "App theme and display options")
         Spacer(modifier = Modifier.height(10.dp))
         StreaklyCard { Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            SettingLabel(Icons.Default.Palette, "Theme Mode", AccentIndigo)
+            SettingLabel(Icons.Default.Palette, "Theme Mode", PrimaryBlue)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ThemeMode.entries.forEach { mode ->
                 val selected = profile.themeMode == mode
-                Button(onClick = { viewModel.setThemeMode(mode) }, colors = ButtonDefaults.buttonColors(containerColor = if (selected) AccentIndigo else MaterialTheme.colorScheme.surfaceVariant, contentColor = if (selected) Color.White else MaterialTheme.colorScheme.onSurface)) { Text(mode.name.lowercase().replaceFirstChar { it.uppercase() }) }
+                Button(onClick = { viewModel.setThemeMode(mode) }, colors = ButtonDefaults.buttonColors(containerColor = if (selected) PrimaryBlue else MaterialTheme.colorScheme.surfaceVariant, contentColor = if (selected) Color.White else MaterialTheme.colorScheme.onSurface)) { Text(mode.name.lowercase().replaceFirstChar { it.uppercase() }) }
             } }
         } }
         Spacer(modifier = Modifier.height(20.dp))
@@ -104,7 +102,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(value = profile.nvidiaApiKey, onValueChange = viewModel::setNvidiaApiKey, placeholder = { Text("nvapi-...") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Spacer(modifier = Modifier.height(16.dp))
-            SettingLabel(Icons.Default.DarkMode, "Model Architecture", DarkPurple)
+            SettingLabel(Icons.Default.DarkMode, "Model Architecture", SlateBlue)
             Spacer(modifier = Modifier.height(8.dp))
             ExposedDropdownMenuBox(expanded = isModelMenuExpanded, onExpandedChange = { isModelMenuExpanded = !isModelMenuExpanded }) {
                 OutlinedTextField(value = profile.selectedModel, onValueChange = {}, readOnly = true, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isModelMenuExpanded) }, modifier = Modifier.menuAnchor().fillMaxWidth())
@@ -117,7 +115,7 @@ fun SettingsScreen(
         StreaklyCard { Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             GoalEditRow(Icons.Default.DirectionsRun, "Daily Steps", "steps", profile.dailyStepGoal, PrimaryBlue, viewModel::updateStepGoal)
             GoalEditRow(Icons.Default.LocalDrink, "Hydration", "ml", profile.dailyWaterGoalMl, SecondaryGreen, viewModel::updateWaterGoal)
-            GoalEditRow(Icons.Default.Nightlight, "Sleep Duration", "min", profile.dailySleepGoalMinutes, DarkPurple, viewModel::updateSleepGoal)
+            GoalEditRow(Icons.Default.Nightlight, "Sleep Duration", "min", profile.dailySleepGoalMinutes, SlateBlue, viewModel::updateSleepGoal)
             GoalEditRow(Icons.Default.LocalFireDepartment, "Active Calories", "kcal", profile.dailyCalorieGoal, FlameOrange, viewModel::updateCalorieGoal)
         } }
         Spacer(modifier = Modifier.height(20.dp))

@@ -52,8 +52,8 @@ import com.streakly.domain.model.HabitWithCompletion
 import com.streakly.domain.model.TimeOfDay
 import com.streakly.ui.common.EmptyState
 import com.streakly.ui.common.StreaklyCard
-import com.streakly.ui.theme.AccentIndigo
 import com.streakly.ui.theme.FlameOrange
+import com.streakly.ui.theme.PrimaryBlue
 import com.streakly.ui.theme.SecondaryGreen
 
 @Composable
@@ -178,7 +178,7 @@ fun HabitTrackerScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 24.dp, bottom = 24.dp),
-            containerColor = AccentIndigo,
+            containerColor = PrimaryBlue,
             contentColor = Color.White
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Habit")
@@ -345,7 +345,7 @@ private fun CreateHabitDialog(
                         val isSelected = selectedTimeOfDay == tod
                         Surface(
                             shape = MaterialTheme.shapes.small,
-                            color = if (isSelected) AccentIndigo else MaterialTheme.colorScheme.surfaceVariant,
+                            color = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.small)
                                 .clickable { selectedTimeOfDay = tod }
@@ -365,7 +365,7 @@ private fun CreateHabitDialog(
             Button(
                 onClick = {
                     if (name.isNotBlank()) {
-                        onSave(name, selectedTimeOfDay, "#5B6EF5")
+                        onSave(name, selectedTimeOfDay, "#2563EB")
                     }
                 },
                 enabled = name.isNotBlank()
